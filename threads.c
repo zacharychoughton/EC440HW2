@@ -151,7 +151,7 @@ void pthread_create_helper(){
 } 
 
 /**********************schedule************************/
-void schedule(){ 
+static void schedule(){ 
     if(TCBlist[currentthread].status ==1); /*running)*/{
     TCBlist[currentthread].status = 2; /*ready*/
     }
