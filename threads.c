@@ -6,6 +6,7 @@
 #include <stdio.h> 
 #include <pthread.h>
 #include <unistd.h>
+#include <strings.h>
 
 /**********************************************/
 
@@ -82,8 +83,7 @@ int pthread_create(
 
     TCBlist[currentthread].regs[0].__jmpbuf[JB_R13] = (long) arg; 
 
-    TCBlist[currentthread].regs[0].__jmpbuf[JB_R12];
-    // = (unsigned long int) start_routine; 
+    TCBlist[currentthread].regs[0].__jmpbuf[JB_R12] = (unsigned long int) start_routine; 
 
     }
     else{
@@ -91,7 +91,7 @@ int pthread_create(
     }
     
     
-    TCBlist[0].threadid
+    TCBlist[0].threadid;
     
     
     //Creates a stack 

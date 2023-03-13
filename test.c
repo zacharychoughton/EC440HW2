@@ -1,26 +1,22 @@
-#include "zthreadlib.h"
+#include "ec440threads.h"
 #include <setjmp.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <stdio.h> 
 #include <pthread.h>
 
-int printtest(void* ptr) { 
-    printf("\nstatus: %d", (*(tid *)ptr).status);
+int passfunc(void *args) { 
     return 0; 
 }
 
 int main(){
-    tid athread; // thread ID structure. 
-    const void *attr; //attricbute about thread, always null for this. 
-    void *(*start_routine) (void*); //function for created thread to execute. 
-    void *arg;
-
+    pthread_t athread; // thread ID structure. 
+    const pthread_attr_t *attr; //attricbute about thread, always null for this. 
+    void *args = 0; 
     attr = NULL; 
-    void *ptr = &athread;
-    int (*printtest_ptr)(void*) = &printtest; 
+    int (*passfunc_ptr)(void*) = &passfunc; 
 
-    zthread_create(athread, attr, printtest_ptr, ptr); 
+    pthread_create(&athread, attr, passfunc_ptr, args); 
 
     return 0;
 }
