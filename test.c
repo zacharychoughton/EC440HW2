@@ -5,18 +5,21 @@
 #include <stdio.h> 
 #include <pthread.h>
 
-int passfunc(void *args) { 
-    return 0; 
+void passfunc(void *args) { 
+    printf("hi/n");
+    return; 
 }
 
 int main(){
-    pthread_t *athread; // thread ID structure. 
+    pthread_t *athread;
+    pthread_t thread1;  // thread ID structure. 
+    athread = &thread1;
     const pthread_attr_t *attr; //attricbute about thread, always null for this. 
     void *args = 0; 
     attr = NULL; 
-    int (*passfunc_ptr)(void*) = &passfunc; 
+    void (*passfunc_ptr)(void*) = &passfunc; 
 
-    pthread_create(&athread, attr, passfunc_ptr, args); 
+    pthread_create(athread, attr, passfunc_ptr, args); 
 
     return 0;
 }
