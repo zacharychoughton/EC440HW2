@@ -10,7 +10,7 @@ int passfunc(void *args) {
 }
 
 int main(){
-    pthread_t athread; // thread ID structure. 
+    pthread_t *athread; // thread ID structure. 
     const pthread_attr_t *attr; //attricbute about thread, always null for this. 
     void *args = 0; 
     attr = NULL; 
