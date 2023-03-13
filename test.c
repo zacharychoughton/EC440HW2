@@ -5,7 +5,7 @@
 #include <stdio.h> 
 #include <pthread.h>
 
-void passfunc(void *args) { 
+void* passfunc(void *args) { 
     printf("hi/n");
     return; 
 }
