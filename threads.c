@@ -137,7 +137,7 @@ void pthread_create_helper(){
    // First, it initializes the thread array, all relevant data structures, and a stack space.  
    // It sets up a stack space using malloc for the threads
 
-    int i,s; 
+    int i; 
 
     for (i=0 ; i < max_threads ; ++i) {
         TCBlist[ i ].status = 4; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
