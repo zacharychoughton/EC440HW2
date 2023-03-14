@@ -34,7 +34,7 @@ pthread_t currentthread = 0; //current thread index
 
 static int mainthread = 0; // to see if we are in main process or thread (1 if yes, 0 if no)
 
-static int numthreads = 0; //number of threads running 
+static int numthreads = 1; //number of threads running 
 
 struct sigaction sighandler, oldsighandler; 
 stack_t stack, oldstack; 
@@ -92,7 +92,7 @@ int pthread_create(
     //Want sp to point to top of new stack. (stacks grow down for us).
     void* bottom = TCBlist[currentthread].sp + STACK_SIZE; 
     void* stack = bottom - sizeof(&pthread_exit); 
-    void (*temp)(void*) = (void*) &pthread_exit; 
+    void (*temp)(void*) = (void*) &pthread_exit; //pthread exit will be called when start_routine returns. 
     stack = memcpy(stack,&temp, sizeof(temp)); 
 
     TCBlist[currentthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
@@ -100,6 +100,7 @@ int pthread_create(
     TCBlist[currentthread].status = 2; 
     TCBlist[currentthread].threadid = currentthread; 
 
+    numthreads++; 
 
     schedule(SIGALRM); 
 
@@ -215,5 +216,23 @@ void pthread_exit(void *value_ptr){
     and pass return value of routine as exit status. 
     and when mainthread returns, call normal exit.
     Remember to decrement numthreads*/ 
+    TCBlist[currentthread].status = 0; //exited status. 
+
+    int i; 
+    for (i = 0; i<max_threads;i++){ 
+        if(TCBlist[i].status == 3 /*blocked*/){
+            schedule(); 
+            }
+        else if (TCBlist[i].status == 0 ){
+                break; 
+            }
+        }
+
+    for( i = 0; i< max_threads; i++){
+        if(TCBlist[i].status == 0){
+            free(TCBlist[i].sp);
+        }
+    }
+    
     exit(0); 
 }
