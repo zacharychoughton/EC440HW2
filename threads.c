@@ -241,6 +241,6 @@ void pthread_exit(void *value_ptr){
             TCBlist[i].threadid = 0; 
         }
     }
-    
-    exit(0); 
+
+return; 
 }
