@@ -156,7 +156,7 @@ void pthread_create_helper(){
     const struct itimerval* timeptr = &timing; 
     
 
-    s = setitimer(ITIMER_REAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
+    s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
     if (s == -1){ 
         printf("Error creating timer\n");
         exit(1); 
@@ -166,7 +166,7 @@ void pthread_create_helper(){
     sigemptyset(&sighandler.sa_mask);
     sighandler.sa_handler = &schedule; 
     sighandler.sa_flags = SA_NODEFER; 
-    sigaction(SIGALRM, &sighandler, NULL); 
+    sigaction(SIGVTALRM, &sighandler, NULL); 
 } 
 
 /**********************schedule************************/
