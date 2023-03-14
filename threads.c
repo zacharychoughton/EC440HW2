@@ -149,14 +149,15 @@ void pthread_create_helper(){
     //setting up timer. 
     struct timeval timeint, timeval;
     timeint.tv_usec = quanta; 
+    timeint.tv_sec = quanta/1000000; 
     timeval.tv_usec = quanta; 
+    timeint.tv_sec = quanta/1000000; 
     struct itimerval timing;
     timing.it_interval = timeint;
     timing.it_value = timeval;
     const struct itimerval* timeptr = &timing; 
-    
 
-    s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
+    s = setitimer(ITIMER_REAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
     if (s == -1){ 
         printf("Error creating timer\n");
         exit(1); 
@@ -166,7 +167,7 @@ void pthread_create_helper(){
     sigemptyset(&sighandler.sa_mask);
     sighandler.sa_handler = &schedule; 
     sighandler.sa_flags = SA_NODEFER; 
-    sigaction(SIGVTALRM, &sighandler, NULL); 
+    sigaction(SIGALRM, &sighandler, NULL); 
 } 
 
 /**********************schedule************************/
