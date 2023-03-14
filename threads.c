@@ -61,7 +61,7 @@ int pthread_create(
         pthread_create_helper(); 
         first_time = 0;
         TCBlist[currentthread].status = 1; //running
-        mainthread = setjmp(TCBlist[0].regs); //return 0 on set, returns nonzero integer on return from longjmp. 
+        mainthread = setjmp(TCBlist[currentthread].regs); //return 0 on set, returns nonzero integer on return from longjmp. 
         //TCBlist[0].regs has main context. 
     } //initilizes thread subsystem. 
 
@@ -70,35 +70,36 @@ int pthread_create(
         return -1;
     } //if max number of threads reach, returns -1 and does not make a new thread.
 
+    pthread_t newthread = currentthread; 
+
     if(!mainthread){ 
-    
-    currentthread = 1; 
-    while(TCBlist[currentthread].status != 4){
-        currentthread++; 
+
+    while(TCBlist[newthread].status != 4){
+        newthread++; 
     }
 
-    thread = &TCBlist[currentthread].threadid;
+    thread = &TCBlist[newthread].threadid;
 
-    setjmp(TCBlist[currentthread].regs);
+    setjmp(TCBlist[newthread].regs);
 
-    TCBlist[currentthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk); //sets program counter. 
+    TCBlist[newthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk); //sets program counter. 
     //starthunk moves value of R13 to RDI. Then jumps to address of R12. so R13 should be arg, and R12 should be function. 
-    TCBlist[currentthread].regs->__jmpbuf[JB_R13] = (long) arg; 
+    TCBlist[newthread].regs->__jmpbuf[JB_R13] = (long) arg; 
 
-    TCBlist[currentthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
+    TCBlist[newthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
 
-    TCBlist[currentthread].sp = malloc(STACK_SIZE); //malloc points to bottom of stack. 
+    TCBlist[newthread].sp = malloc(STACK_SIZE); //malloc points to bottom of stack. 
 
     //Want sp to point to top of new stack. (stacks grow down for us).
-    void* bottom = TCBlist[currentthread].sp + STACK_SIZE; 
+    void* bottom = TCBlist[newthread].sp + STACK_SIZE; 
     void* stack = bottom - sizeof(&pthread_exit); 
     void (*temp)(void*) = (void*) &pthread_exit; //pthread exit will be called when start_routine returns. 
     stack = memcpy(stack,&temp, sizeof(temp)); 
 
-    TCBlist[currentthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
+    TCBlist[newthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
 
-    TCBlist[currentthread].status = 2; 
-    TCBlist[currentthread].threadid = currentthread; 
+    TCBlist[newthread].status = 2; 
+    TCBlist[newthread].threadid = newthread; 
 
     numthreads++; 
 
@@ -174,20 +175,24 @@ void schedule(int sig){
     TCBlist[currentthread].status = 2; /*ready*/
     }
 
+
     // Find Next Ready Thread 
     pthread_t FindID = currentthread; 
     FindID++; 
+
     while(1){
-        if(FindID == max_threads-1){
+        if(FindID == max_threads+1){
             FindID = 0; 
         }
         else{
+
+            if(TCBlist[FindID].status == 2){
+            break; 
+            }
+
             FindID++; 
         }
 
-        if(TCBlist[currentthread].status == 2){
-            break; 
-        }
     }
 
     // Saves current thread context 
