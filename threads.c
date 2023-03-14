@@ -26,7 +26,7 @@
 
 #define max_threads 128 //max number of threads
 
-#define quanta (50*1000) // quanta: 50 ms for each thread executuion time 
+#define quanta (50000) // quanta: 50 ms (50,000 micro s) for each thread executuion time 
 
 static int first_time = 1; // determines if helper is called 
 
@@ -39,7 +39,7 @@ static int numthreads = 0; //number of threads running
 struct sigaction sighandler, oldsighandler; 
 stack_t stack, oldstack; 
 
-jmp_buf alphathread; //main context 
+//jmp_buf alpha; //main context 
 
 struct TCB{ 
     int status; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
@@ -48,7 +48,7 @@ struct TCB{
     pthread_t threadid; //thread ID 
 }; 
 
-struct TCB TCBlist[ max_threads ]; //List of TCBs. 
+static struct TCB TCBlist[ max_threads ]; //List of TCBs. 
 
 /*******************pthread_create***************************/
 int pthread_create(
@@ -60,8 +60,9 @@ int pthread_create(
     if (first_time){
         pthread_create_helper(); 
         first_time = 0;
-        TCBlist[0].status = 2; //ready
+        TCBlist[currentthread].status = 1; //running
         mainthread = setjmp(TCBlist[0].regs); //return 0 on set, returns nonzero integer on return from longjmp. 
+        //TCBlist[0].regs has main context. 
     } //initilizes thread subsystem. 
 
     if (numthreads == max_threads){
@@ -72,22 +73,23 @@ int pthread_create(
     if(!mainthread){ 
     
     currentthread = 1; 
-    while(TCBlist[currentthread].status != 0){
+    while(TCBlist[currentthread].status != 4){
         currentthread++; 
     }
 
-    *thread = TCBlist[currentthread].threadid;
+    thread = &TCBlist[currentthread].threadid;
 
     setjmp(TCBlist[currentthread].regs);
 
-    TCBlist[currentthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
-
+    TCBlist[currentthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk); //sets program counter. 
+    //starthunk moves value of R13 to RDI. Then jumps to address of R12. so R13 should be arg, and R12 should be function. 
     TCBlist[currentthread].regs->__jmpbuf[JB_R13] = (long) arg; 
 
     TCBlist[currentthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
 
-    TCBlist[currentthread].sp = malloc(STACK_SIZE);
+    TCBlist[currentthread].sp = malloc(STACK_SIZE); //malloc points to bottom of stack. 
 
+    //Want sp to point to top of new stack. (stacks grow down for us).
     void* bottom = TCBlist[currentthread].sp + STACK_SIZE; 
     void* stack = bottom - sizeof(&pthread_exit); 
     void (*temp)(void*) = (void*) &pthread_exit; 
@@ -120,7 +122,7 @@ int pthread_create(
     // sigaltstack(&oldstack,0); 
     // sigaction(SIGUSR1, &oldsighandler, 0);
 
-    TCBlist[numthreads].status = 1; //ready
+    TCBlist[numthreads].status = 2; //ready
     TCBlist[numthreads].sp = stack.ss_sp; 
 
     numthreads ++; 
@@ -139,8 +141,10 @@ void pthread_create_helper(){
     for (i=0 ; i < max_threads ; ++i) {
         TCBlist[ i ].status = 4; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
         TCBlist[ i ].sp = 0;
+        TCBlist[i].threadid = 0; 
     }
     
+    //setting up timer. 
     struct timeval timeint, timeval;
     timeint.tv_usec = quanta; 
     timeval.tv_usec = quanta; 
@@ -150,7 +154,7 @@ void pthread_create_helper(){
     const struct itimerval* timeptr = &timing; 
     
 
-    s = setitimer(1,timeptr,NULL); //sets up regular SIGALRM intervals. 
+    s = setitimer(ITIMER_REAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
     if (s == -1){ 
         printf("Error creating timer\n");
         exit(1); 
@@ -170,7 +174,7 @@ void schedule(int sig){
     }
 
     // Find Next Ready Thread 
-    int FindID = currentthread; 
+    pthread_t FindID = currentthread; 
     FindID++; 
     while(1){
         if(FindID == max_threads-1){
@@ -187,8 +191,8 @@ void schedule(int sig){
 
     // Saves current thread context 
     int setup = 0; 
-    if( TCBlist[FindID].status != 0){
-        setup = setjmp(TCBlist[FindID].regs);
+    if( TCBlist[currentthread].status != 0){
+        setup = setjmp(TCBlist[currentthread].regs);
     }
 
     //Runs Thread
