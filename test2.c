@@ -6,7 +6,9 @@
 #include <pthread.h>
 
 void passfunc(void *args) { 
-    printf("hi/n");
+    printf("hi 1\n");
+    wait(3);
+    printf("hi 2\n");
     return; 
 }
 

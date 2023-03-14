@@ -236,6 +236,8 @@ void pthread_exit(void *value_ptr){
     for( i = 0; i< max_threads; i++){
         if(TCBlist[i].status == 0){
             free(TCBlist[i].sp);
+            TCBlist[i].status = 4; //reset to unused.
+            TCBlist[i].threadid = 0; 
         }
     }
     
