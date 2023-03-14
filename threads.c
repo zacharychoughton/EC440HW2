@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <strings.h>
+#include <sys/time.h>
 
 /**********************************************/
 
@@ -38,7 +39,7 @@ static int numthreads = 0; //number of threads running
 struct sigaction sighandler, oldsighandler; 
 stack_t stack, oldstack; 
 
-jmp_buf main; 
+jmp_buf alphathread; 
 
 struct TCB{ 
     int status; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
@@ -47,7 +48,7 @@ struct TCB{
     pthread_t threadid; //thread ID 
 }; 
 
-static struct TCB TCBlist[ max_threads ]; //List of TCBs. 
+struct TCB TCBlist[ max_threads ]; //List of TCBs. 
 
 /*******************pthread_create***************************/
 int pthread_create(
@@ -79,11 +80,12 @@ int pthread_create(
 
     setjmp(TCBlist[currentthread].regs);
 
-    TCBlist[currentthread].regs[0].__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
+    TCBlist[currentthread].regs[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
+    //.__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
 
-    TCBlist[currentthread].regs[0].__jmpbuf[JB_R13] = (long) arg; 
+    TCBlist[currentthread].regs[JB_R13] = (long) arg; 
 
-    TCBlist[currentthread].regs[0].__jmpbuf[JB_R12] = (unsigned long int) start_routine; 
+    TCBlist[currentthread].regs[JB_R12] = (unsigned long int) start_routine; 
 
     }
     else{
@@ -116,7 +118,7 @@ int pthread_create(
 
     numthreads ++; 
 
-    schedule(); 
+    schedule(SIGALRM); 
 
  return 0; 
 } 
@@ -134,10 +136,16 @@ void pthread_create_helper(){
         TCBlist[ i ].sp = 0;
     }
     
-    struct timeval timing; 
-    timing.tv_sec = quanta; 
-    timing.tv_usec = quanta; 
-    s = usetitimer(1,timing,NULL); //sets up regular SIGALRM intervals. 
+    struct timeval timeint, timeval;
+    timeint.tv_usec = quanta; 
+    timeval.tv_usec = quanta; 
+    struct itimerval timing;
+    timing.it_interval = timeint;
+    timing.it_value = timeval;
+    const struct itimerval* timeptr = &timing; 
+    
+
+    s = setitimer(1,timeptr,NULL); //sets up regular SIGALRM intervals. 
     if (s == -1){ 
         printf("Error creating timer\n");
         exit(1); 
@@ -151,8 +159,8 @@ void pthread_create_helper(){
 } 
 
 /**********************schedule************************/
-void schedule(){ 
-    if(TCBlist[currentthread].status ==1); /*running)*/{
+void schedule(int sig){ 
+    if(TCBlist[currentthread].status ==1) /*running)*/{
     TCBlist[currentthread].status = 2; /*ready*/
     }
 
@@ -183,12 +191,14 @@ void schedule(){
         currentthread = FindID; 
         TCBlist[currentthread].status = 1; 
         longjmp(TCBlist[currentthread].regs,1);
-    }
+    } 
 }
 
 /*******************zthread_self***************************/
 pthread_t pthread_self(void){
-    return currentthread;
+    pthread_t pid;
+    *pid = currentthread; 
+    return pid;
 }
 
 /******************pthread_exit****************************/
@@ -198,5 +208,5 @@ void pthread_exit(void *value_ptr){
     and pass return value of routine as exit status. 
     and when mainthread returns, call normal exit.
     Remember to decrement numthreads*/ 
-
+    exit(0); 
 }
