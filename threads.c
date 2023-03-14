@@ -224,16 +224,22 @@ void pthread_exit(void *value_ptr){
     Remember to decrement numthreads*/ 
     TCBlist[currentthread].status = 0; //exited status. 
 
-    int i; 
+    int i,j=0;
+
     for (i = 0; i<max_threads;i++){ 
         if(TCBlist[i].status == 3 /*blocked*/){
-            schedule(SIGALRM); 
+            j = 1; 
+            break; 
             }
-        else if (TCBlist[i].status == 0 ){
+        else if (TCBlist[i].status == 4 ){
                 break; 
             }
-        }
+    }
 
+    if(j){ 
+        schedule(); 
+    }
+    
     for( i = 0; i< max_threads; i++){
         if(TCBlist[i].status == 0){
             free(TCBlist[i].sp);
@@ -241,5 +247,5 @@ void pthread_exit(void *value_ptr){
             TCBlist[i].threadid = 0; 
         }
     }
-
+    exit(0);
 }
