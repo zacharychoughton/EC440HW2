@@ -237,9 +237,9 @@ void pthread_exit(void *value_ptr){
     }
 
     if(j){ 
-        schedule(); 
+        schedule(SIGALRM); 
     }
-    
+
     for( i = 0; i< max_threads; i++){
         if(TCBlist[i].status == 0){
             free(TCBlist[i].sp);
