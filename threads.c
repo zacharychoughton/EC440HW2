@@ -221,28 +221,33 @@ void pthread_exit(void *value_ptr){
     TCBlist[currentthread].status = 0; //exited status. 
 
     numthreads--; 
-    int i,j=0;
+    //int i,j=0;
 
-    for (i = 0; i<max_threads;i++){ 
-        if(TCBlist[i].status == 3 /*blocked*/){
-            j = 1; 
-            break; 
-            }
-        else if (TCBlist[i].status == 4 ){
-                break; 
-            }
-    }
+    free(TCBlist[currentthread].sp);
+    TCBlist[currentthread].status = 4; 
+    TCBlist[currentthread].threadid = 0;
+    schedule(SIGALRM);
+    
+    // for (i = 0; i<max_threads;i++){ 
+    //     if(TCBlist[i].status == 3 /*blocked*/){
+    //         j = 1; 
+    //         break; 
+    //         }
+    //     else if (TCBlist[i].status == 4 ){
+    //             break; 
+    //         }
+    // }
 
-    if(j){ 
-        schedule(SIGALRM); 
-    }
+    // if(j){ 
+    //     schedule(SIGALRM); 
+    // }
 
-    for( i = 0; i< max_threads; i++){
-        if(TCBlist[i].status == 0){
-            free(TCBlist[i].sp);
-            TCBlist[i].status = 4; //reset to unused.
-            TCBlist[i].threadid = 0; 
-        }
-    }
+    // for( i = 0; i< max_threads; i++){
+    //     if(TCBlist[i].status == 0){
+    //         free(TCBlist[i].sp);
+    //         TCBlist[i].status = 4; //reset to unused.
+    //         TCBlist[i].threadid = 0; 
+    //     }
+    // }
     exit(0);
 }
