@@ -72,7 +72,7 @@ int pthread_create(
 
     pthread_t newthread = currentthread; 
 
-    if(!mainthread){ 
+    // if(!mainthread){ 
 
     while(TCBlist[newthread].status != 4){
         newthread++; 
@@ -105,28 +105,14 @@ int pthread_create(
 
     schedule(SIGALRM); 
 
-    }
-    else{
-        mainthread =0; 
-    }
-    
-    
-    //TCBlist[0].threadid;
-    
+    // }
+    // else{
+    //     mainthread =0; 
+    // }
 
+    // TCBlist[numthreads].status = 2; //ready 
 
-    // sighandler.sa_handler = &SIGUSR1Handler;  
-    // sighandler.sa_flags = SA_ONSTACK; 
-    // sigemptyset(&sighandler.sa_mask); 
-    // sigaction(SIGUSR1, &sighandler, &oldsighandler);
-    // raise(SIGUSR1); 
-
-    // sigaltstack(&oldstack,0); 
-    // sigaction(SIGUSR1, &oldsighandler, 0);
-
-    TCBlist[numthreads].status = 2; //ready 
-
-    numthreads ++; 
+    // numthreads ++; 
 
  return 0; 
 } 
@@ -156,6 +142,7 @@ void pthread_create_helper(){
     // timing.it_value = timeval;
     // const struct itimerval* timeptr = &timing; 
 
+    //int s;
     // s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
 
     // if (s == -1){ 
@@ -163,14 +150,14 @@ void pthread_create_helper(){
     //     exit(1); 
     // }
 
+    useconds_t timer = uquanta;
+    ualarm(timer,timer); 
+
     //respond to SIGALRM. -> SIGALRM calls schedule. 
     sigemptyset(&sighandler.sa_mask);
     sighandler.sa_handler = &schedule; 
     sighandler.sa_flags = SA_NODEFER; 
     sigaction(SIGALRM, &sighandler, NULL); 
-
-    useconds_t timer = uquanta;
-    ualarm(timer,timer); 
 
 } 
 
