@@ -158,7 +158,7 @@ void pthread_create_helper(){
 
     // s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
     useconds_t timer = uquanta;
-    ularm(timer,timer); 
+    ualarm(timer,timer); 
 
     // if (s == -1){ 
     //     printf("Error creating timer\n");
