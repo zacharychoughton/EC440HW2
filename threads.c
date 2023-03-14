@@ -149,7 +149,7 @@ void pthread_create_helper(){
     timeint.tv_usec = quanta; 
     timeint.tv_sec = quanta/1000000; 
     timeval.tv_usec = quanta; 
-    timeint.tv_sec = quanta/1000000; 
+    timeval.tv_sec = quanta/1000000; 
     struct itimerval timing;
     timing.it_interval = timeint;
     timing.it_value = timeval;
