@@ -24,7 +24,7 @@
 
 #define STACK_SIZE 32767
 
-#define max_threads 128 //max number of threads
+#define max_threads 5 //max number of threads
 
 #define quanta (50000) // quanta: 50 ms (50,000 micro s) for each thread executuion time 
 
