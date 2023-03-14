@@ -19,7 +19,7 @@ int main(){
     attr = NULL; 
     void *(*passfunc_ptr)(void*) = *passfunc; 
 
-    pthread_create(athread, attr, passfunc_ptr, args); 
+    pthread_create(athread, attr,  passfunc_ptr, args); 
 
     return 0;
 }
