@@ -30,7 +30,7 @@
 
 static int first_time = 1; // determines if helper is called 
 
-int currentthread = 0; //current thread index
+pthread_t currentthread = 0; //current thread index
 
 static int mainthread = 0; // to see if we are in main process or thread (1 if yes, 0 if no)
 
@@ -81,19 +81,25 @@ int pthread_create(
     setjmp(TCBlist[currentthread].regs);
 
     TCBlist[currentthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
-    //.__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
 
     TCBlist[currentthread].regs->__jmpbuf[JB_R13] = (long) arg; 
 
     TCBlist[currentthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
 
-    //Creates a stack 
-    stack.ss_flags = 0; 
-    stack.ss_size = STACK_SIZE; 
-    stack.ss_sp = malloc(STACK_SIZE); 
-    if (stack.ss_sp == 0) {printf("Error allocating stack"); return -2;}
+    TCBlist[currentthread].sp = malloc(STACK_SIZE);
 
-    sigaltstack(&stack, &oldstack); //Instals signal handler on new stack
+    void* bottom = TCBlist[currentthread].sp + STACK_SIZE; 
+    void* stack = bottom - sizeof(&pthread_exit); 
+    void (*temp)(void*) = (void*) &pthread_exit; 
+    stack = memcpy(stack,&temp, sizeof(temp)); 
+
+    TCBlist[currentthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
+
+    TCBlist[currentthread].status = 2; 
+    TCBlist[currentthread].threadid = currentthread; 
+
+
+    schedule(SIGALRM); 
 
     }
     else{
@@ -118,8 +124,6 @@ int pthread_create(
     TCBlist[numthreads].sp = stack.ss_sp; 
 
     numthreads ++; 
-
-    schedule(SIGALRM); 
 
  return 0; 
 } 
@@ -197,8 +201,7 @@ void schedule(int sig){
 
 /*******************zthread_self***************************/
 pthread_t pthread_self(void){
-    pthread_t pid = 1; 
-    return pid;
+    return currentthread;
 }
 
 /******************pthread_exit****************************/
