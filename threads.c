@@ -26,7 +26,8 @@
 
 #define max_threads 5 //max number of threads
 
-#define quanta 50000 // quanta: 50 ms (50,000 micro s) for each thread executuion time 
+#define uquanta 50000 // quanta: 50 ms (50,000 micro s) for each thread executuion time 
+#define quanta 0.05 //seconds 
 
 static int first_time = 1; // determines if helper is called 
 
@@ -146,10 +147,10 @@ void pthread_create_helper(){
     
     //setting up timer. 
     struct timeval timeint, timeval;
-    timeint.tv_usec = quanta; 
-    timeint.tv_sec = quanta/1000000; 
-    timeval.tv_usec = quanta; 
-    timeval.tv_sec = quanta/1000000; 
+    timeint.tv_usec = uquanta; 
+    timeint.tv_sec = quanta; 
+    timeval.tv_usec = uquanta; 
+    timeval.tv_sec = quanta;
     struct itimerval timing;
     timing.it_interval = timeint;
     timing.it_value = timeval;
