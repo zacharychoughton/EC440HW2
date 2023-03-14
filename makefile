@@ -10,7 +10,7 @@ CC = gcc
 
 #jmp1 : jmp1.o ec440threads.h 
 #test : test.o ec440threads.h
-threads.o: threads.o ec440threads.h
+threads.o: threads.c ec440threads.h
 #sched_simple : sched_simple.o
 
 # .PHONY: clean 
@@ -29,6 +29,6 @@ check: checkprogs
 
 clean:
 	rm -f *.o $(test_files) $(test_o_files)
-	
+
 # clean:
 # 	rm -f *.o *~ $(prog)
