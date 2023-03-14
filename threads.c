@@ -93,7 +93,7 @@ int pthread_create(
     }
     
     
-    TCBlist[0].threadid;
+    //TCBlist[0].threadid;
     
     
     //Creates a stack 
@@ -196,8 +196,7 @@ void schedule(int sig){
 
 /*******************zthread_self***************************/
 pthread_t pthread_self(void){
-    pthread_t pid;
-    *pid = currentthread; 
+    pthread_t pid = 1; 
     return pid;
 }
 
