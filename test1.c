@@ -9,7 +9,7 @@
 void passfunc(void *args) { 
     printf("hi 1\n");
     int i=0; 
-    while(i<1000){
+    while(i<10){
         i= i+ 0.1; 
     }
     printf("hi 2\n");
