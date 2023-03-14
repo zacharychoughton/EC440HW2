@@ -4,10 +4,11 @@
 #include <signal.h>
 #include <stdio.h> 
 #include <pthread.h>
+#include <unistd.h>
 
 void passfunc(void *args) { 
     printf("hi 1\n");
-    wait(3);
+    sleep(3);
     printf("hi 2\n");
     return; 
 }
