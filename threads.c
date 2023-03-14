@@ -167,7 +167,7 @@ void pthread_create_helper(){
     sigemptyset(&sighandler.sa_mask);
     sighandler.sa_handler = &schedule; 
     sighandler.sa_flags = SA_NODEFER; 
-    sigaction(SIGVTALRM, &sighandler, NULL); 
+    sigaction(SIGALRM, &sighandler, NULL); 
 
     useconds_t timer = uquanta;
     ualarm(timer,timer); 
