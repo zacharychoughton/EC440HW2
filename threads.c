@@ -103,7 +103,7 @@ int pthread_create(
 
     numthreads++; 
 
-    schedule(SIGALRM); 
+    schedule(); 
 
     // }
     // else{
@@ -162,7 +162,7 @@ void pthread_create_helper(){
 } 
 
 /**********************schedule************************/
-void schedule(int sig){ 
+void schedule(void){ 
     if(TCBlist[currentthread].status ==1) /*running)*/{
     TCBlist[currentthread].status = 2; /*ready*/
     }
@@ -219,7 +219,7 @@ void pthread_exit(void *value_ptr){
 
     free(TCBlist[currentthread].sp);
     TCBlist[currentthread].status = 4; 
-    schedule(SIGALRM);
+    schedule();
 
     // for (i = 0; i<max_threads;i++){ 
     //     if(TCBlist[i].status == 3 /*blocked*/){
