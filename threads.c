@@ -80,12 +80,12 @@ int pthread_create(
 
     setjmp(TCBlist[currentthread].regs);
 
-    TCBlist[currentthread].regs.__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
+    TCBlist[currentthread].regs->__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
     //.__jmpbuf[JB_PC] = ptr_mangle((unsigned long int)start_thunk);
 
-    TCBlist[currentthread].regs.__jmpbuf[JB_R13] = (long) arg; 
+    TCBlist[currentthread].regs->__jmpbuf[JB_R13] = (long) arg; 
 
-    TCBlist[currentthread].regs.__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
+    TCBlist[currentthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
 
     }
     else{
