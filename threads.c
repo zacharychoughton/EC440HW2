@@ -26,7 +26,7 @@
 
 #define max_threads 5 //max number of threads
 
-#define quanta (50000) // quanta: 50 ms (50,000 micro s) for each thread executuion time 
+#define quanta 50000 // quanta: 50 ms (50,000 micro s) for each thread executuion time 
 
 static int first_time = 1; // determines if helper is called 
 
@@ -37,7 +37,6 @@ static int mainthread = 0; // to see if we are in main process or thread (1 if y
 static int numthreads = 1; //number of threads running 
 
 struct sigaction sighandler, oldsighandler; 
-stack_t stack, oldstack; 
 
 //jmp_buf alpha; //main context 
 
@@ -185,7 +184,7 @@ void schedule(int sig){
         if(FindID == max_threads+1){
             FindID = 0; 
         }
-        else{
+        else if (numthreads!= 0){
 
             if(TCBlist[FindID].status == 2){
             break; 
@@ -227,7 +226,7 @@ void pthread_exit(void *value_ptr){
     TCBlist[currentthread].status = 4; 
     TCBlist[currentthread].threadid = 0;
     schedule(SIGALRM);
-    
+
     // for (i = 0; i<max_threads;i++){ 
     //     if(TCBlist[i].status == 3 /*blocked*/){
     //         j = 1; 
