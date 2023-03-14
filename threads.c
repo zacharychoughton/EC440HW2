@@ -123,8 +123,7 @@ int pthread_create(
     // sigaltstack(&oldstack,0); 
     // sigaction(SIGUSR1, &oldsighandler, 0);
 
-    TCBlist[numthreads].status = 2; //ready
-    TCBlist[numthreads].sp = stack.ss_sp; 
+    TCBlist[numthreads].status = 2; //ready 
 
     numthreads ++; 
 
