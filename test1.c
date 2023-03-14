@@ -12,13 +12,14 @@ void passfunc(void *args) {
 
 int main(){
     pthread_t *athread[100];
-    pthread_t thread1;  // thread ID structure. 
-    athread = &thread1;
+    //pthread_t thread1[100];  // thread ID structure. 
+    //athread = &thread1;
     const pthread_attr_t *attr; //attricbute about thread, always null for this. 
     void *args = 0; 
     attr = NULL; 
     void *(*passfunc_ptr)(void*) = &passfunc; 
-
+    int i; 
+    
     for( int i = 0; i<100; i++);{
     pthread_create(athread[i], attr,  passfunc_ptr, args); 
     }
