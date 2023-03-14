@@ -32,14 +32,14 @@ static int first_time = 1; // determines if helper is called
 
 int currentthread = 0; //current thread index
 
-static int mainthread = 0; // to see if we are in main process or thread
+static int mainthread = 0; // to see if we are in main process or thread (1 if yes, 0 if no)
 
 static int numthreads = 0; //number of threads running 
 
 struct sigaction sighandler, oldsighandler; 
 stack_t stack, oldstack; 
 
-jmp_buf alphathread; 
+jmp_buf alphathread; //main context 
 
 struct TCB{ 
     int status; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
@@ -87,6 +87,14 @@ int pthread_create(
 
     TCBlist[currentthread].regs->__jmpbuf[JB_R12]  = (unsigned long int) start_routine; 
 
+    //Creates a stack 
+    stack.ss_flags = 0; 
+    stack.ss_size = STACK_SIZE; 
+    stack.ss_sp = malloc(STACK_SIZE); 
+    if (stack.ss_sp == 0) {printf("Error allocating stack"); return -2;}
+
+    sigaltstack(&stack, &oldstack); //Instals signal handler on new stack
+
     }
     else{
         mainthread =0; 
@@ -95,14 +103,7 @@ int pthread_create(
     
     //TCBlist[0].threadid;
     
-    
-    //Creates a stack 
-    stack.ss_flags = 0; 
-    stack.ss_size = STACK_SIZE; 
-    stack.ss_sp = malloc(STACK_SIZE); 
-    if (stack.ss_sp == 0) {printf("Error allocating stack"); return -2;}
 
-    sigaltstack(&stack, &oldstack); 
 
     // sighandler.sa_handler = &SIGUSR1Handler;  
     // sighandler.sa_flags = SA_ONSTACK; 
@@ -113,7 +114,7 @@ int pthread_create(
     // sigaltstack(&oldstack,0); 
     // sigaction(SIGUSR1, &oldsighandler, 0);
 
-    TCBlist[numthreads].status = 1;
+    TCBlist[numthreads].status = 1; //ready
     TCBlist[numthreads].sp = stack.ss_sp; 
 
     numthreads ++; 

@@ -14,7 +14,7 @@ int pthread_create(
     void *arg);
 //Creates a new thread stored in address athread. 
 
-void pthread_create_helper(); 
+void pthread_create_helper(void); 
 //Initilizes threads, sets up scheduler, and TCB.
 
 void schedule(int sig); 
