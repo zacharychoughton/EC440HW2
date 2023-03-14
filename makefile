@@ -13,7 +13,7 @@ tests/%: tests/%.o threads.o
 	$(CC) $(LDFLAGS) $+ $(LOADLIBES) $(LDLIBS) -o $@
 
 checkprogs: $(test_files)
-
+ 
 check: checkprogs
 	tests/run_tests.sh $(test_files)
 
