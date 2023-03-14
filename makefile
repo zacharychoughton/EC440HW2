@@ -1,8 +1,8 @@
 override CFLAGS :=  -Werror -Wall -std=gnu99 -O0 -g $(CFLAGS) -I.
 CC = gcc
 
-prog = test threads
-c_files = test.c threads.c
+prog = threads
+c_files = threads.c
 h_files = ec440threads.h 
 
 
