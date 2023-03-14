@@ -141,7 +141,7 @@ void pthread_create_helper(){
     for (i=0 ; i < max_threads ; ++i) {
         TCBlist[ i ].status = 4; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
         TCBlist[ i ].sp = 0;
-        TCBlist[i].threadid = 0; 
+        TCBlist[i].threadid = i; 
     }
     
     //setting up timer. 
