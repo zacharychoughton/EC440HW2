@@ -217,13 +217,10 @@ pthread_t pthread_self(void){
 
 /******************pthread_exit****************************/
 void pthread_exit(void *value_ptr){ 
-    //free stacks. 
-    /*Install signal handler for when start_routine returns
-    and pass return value of routine as exit status. 
-    and when mainthread returns, call normal exit.
-    Remember to decrement numthreads*/ 
+
     TCBlist[currentthread].status = 0; //exited status. 
 
+    numthreads--; 
     int i,j=0;
 
     for (i = 0; i<max_threads;i++){ 

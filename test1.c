@@ -8,7 +8,10 @@
 
 void passfunc(void *args) { 
     printf("hi 1\n");
-    sleep(3);
+    int i=0; 
+    while(i<10000){
+        i= i+ 0.00001; 
+    }
     printf("hi 2\n");
     return; 
 }
