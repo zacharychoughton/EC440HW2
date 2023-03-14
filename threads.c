@@ -6,7 +6,7 @@
 #include <stdio.h> 
 #include <pthread.h>
 #include <unistd.h>
-#include <strings.h>
+#include <string.h>
 #include <sys/time.h>
 
 /**********************************************/
