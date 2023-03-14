@@ -146,21 +146,24 @@ void pthread_create_helper(){
     }
     
     //setting up timer. 
-    struct timeval timeint, timeval;
-    timeint.tv_usec = uquanta; 
-    timeint.tv_sec = quanta; 
-    timeval.tv_usec = uquanta; 
-    timeval.tv_sec = quanta;
-    struct itimerval timing;
-    timing.it_interval = timeint;
-    timing.it_value = timeval;
-    const struct itimerval* timeptr = &timing; 
+    // struct timeval timeint, timeval;
+    // timeint.tv_usec = uquanta; 
+    // timeint.tv_sec = quanta; 
+    // timeval.tv_usec = uquanta; 
+    // timeval.tv_sec = quanta;
+    // struct itimerval timing;
+    // timing.it_interval = timeint;
+    // timing.it_value = timeval;
+    // const struct itimerval* timeptr = &timing; 
 
-    s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
-    if (s == -1){ 
-        printf("Error creating timer\n");
-        exit(1); 
-    }
+    // s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
+    useconds_t timer = uquanta;
+    ularm(timer,timer); 
+
+    // if (s == -1){ 
+    //     printf("Error creating timer\n");
+    //     exit(1); 
+    // }
 
     //respond to SIGALRM. -> SIGALRM calls schedule. 
     sigemptyset(&sighandler.sa_mask);
@@ -175,6 +178,9 @@ void schedule(int sig){
     TCBlist[currentthread].status = 2; /*ready*/
     }
 
+    if(numthreads == 0){
+        exit(0); 
+    } //if no more threads, exit. 
 
     // Find Next Ready Thread 
     pthread_t FindID = currentthread; 
@@ -224,7 +230,6 @@ void pthread_exit(void *value_ptr){
 
     free(TCBlist[currentthread].sp);
     TCBlist[currentthread].status = 4; 
-    TCBlist[currentthread].threadid = 0;
     schedule(SIGALRM);
 
     // for (i = 0; i<max_threads;i++){ 
