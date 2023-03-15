@@ -6,7 +6,10 @@
 
 void* thread_start(void* arg) {
   printf("Thread started\n");
-  sleep(2);
+  double i; 
+      while(i<1000){
+        i= i+ 0.00001; 
+    }
   printf("Thread finished\n");
   return NULL;
 }
@@ -14,7 +17,7 @@ void* thread_start(void* arg) {
 int main() {
   pthread_t tid[10];
   int i; 
-  
+
   for (i=0;i<10;i++){
     int ret = pthread_create(&tid[i], NULL, thread_start, NULL);
     if (ret != 0) {
@@ -24,7 +27,7 @@ int main() {
   printf("Thread IDs: %d\n",tid[i]);
   i++; 
   }
-
+  printf("Main Thread ID %d\n",pthread_self());
   pthread_exit(NULL);
   printf("This line should never be reached\n");
 
