@@ -1,0 +1,29 @@
+This is my attempt at implementing a user level thread scheduler. 
+During the process of coding, many stylistic choices could be made.
+I want to note a few: 
+    When calling pthred_create, execution will immediately switch to the new thread.
+    The stack pointer is freed in pthread_exit, not the scheduler. 
+    As is, there is a status for being blocked tho no handle for a thread of this
+    kind or a method of getting there. 
+        This seems to be ok for an elementary threading library. 
+    The scheduler is actually what exits when all threads are finished. 
+    I (try to) recycle the thread IDs. (Currently ID's are bugged)
+
+A notable challenge I faced was working out using setitimer.
+ I think at some point I figured out that because the numbers 
+ for either the seconds or microseconds input (as I believe it 
+ requires both) was too large to be stored in the required 
+ data type that has to be passed to the function. This made 
+ me switch to the ualarm which was much
+easier to implement. 
+
+At present, this code fails test 3 meaning the thread IDs are 
+improperly returned. I intend to get back to this in the coming 
+days and hopefully fix this as it causes some weird functionality. 
+
+As for resources used, I'd say the man pages from man7.org were incredibley helpful. 
+They helped me resolve proper usage for many of the functions used. 
+Our TA Sadie was also very helpful so thank you to her. 
+The lecture slides about the stack pointer was also incredibly helpful 
+for figuring out and visualiing where the pointers needed to go. 
+
