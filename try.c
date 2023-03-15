@@ -6,6 +6,7 @@
 
 void* thread_start(void* arg) {
   printf("Thread started\n");
+  printf("A Working Thread ID %d\n",pthread_self());
   double i; 
       while(i<1000){
         i= i+ 0.000001; 
@@ -24,7 +25,7 @@ int main() {
     fprintf(stderr, "Error creating thread\n");
     exit(EXIT_FAILURE);
     }
-  printf("Thread IDs: %d\n",tid[i]);
+  printf("Thread IDs: %d %d\n",tid[i],i);
   i++; 
   }
   printf("Main Thread ID %d\n",pthread_self());
