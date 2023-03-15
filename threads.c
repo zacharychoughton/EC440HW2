@@ -96,7 +96,7 @@ int pthread_create(
     TCBlist[newthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
 
     TCBlist[newthread].status = 2; 
-    TCBlist[newthread].threadid = newthread; 
+    //TCBlist[newthread].threadid = newthread; 
 
     numthreads++; 
 
