@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void *passfunc(void *args) { 
+void passfunc(void *args) { 
     printf("hi 1\n");
     double i=0; 
     while(i<1000){
@@ -26,7 +26,7 @@ int main(){
     void *(*passfunc_ptr)(void*) = passfunc; 
     int i; 
 
-    for( int i = 0; i<5; i++){
+    for(i = 0; i<5; i++){
     pthread_create(athread[i], attr,  passfunc_ptr, args); 
     }
 
