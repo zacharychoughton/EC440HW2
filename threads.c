@@ -150,18 +150,18 @@ void pthread_create_helper(){
     //     exit(1); 
     // }
 
-    sighandler.sa_sigaction = &schedule; // set handler function
+    sighandler.sa_handler = &schedule; // set handler function
 
     useconds_t timer = uquanta;
     ualarm(timer,timer); 
 
     //respond to SIGALRM. -> SIGALRM calls schedule. 
-    // sigemptyset(&sighandler.sa_mask);
+    sigemptyset(&sighandler.sa_mask);
     // sighandler.sa_handler = &schedule; 
     sighandler.sa_flags = SA_NODEFER; 
     // sigaction(SIGALRM, &sighandler, NULL); 
 
-    if(signal(SIGALRM,schedule)==SIG_ERR){
+    if(sigaction(SIGALRM,&sighandler,NULL)==SIG_ERR){
 		perror("failed to set signal handler");
 		exit(1);
 	};
