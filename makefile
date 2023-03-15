@@ -13,7 +13,17 @@ tests/%: tests/%.o threads.o
 	$(CC) $(LDFLAGS) $+ $(LOADLIBES) $(LDLIBS) -o $@
 
 checkprogs: $(test_files)
- 
+
+static_analysis:
+	@echo "===== Running a static analyzer ====="
+	# Analyze with clang-tidy. Ignore warnings about language extensions.
+	# We use embedded assembly in a header file. An alternative is to build
+	# from separate .s files and link those functions in.
+	clang-tidy --checks=-clang-diagnostic-language-extension-token threads.c $(test_files) -- $(CFLAGS)
+	@echo ""
+	@echo "===== Running another static analyzer ====="
+	cppcheck threads.c $(test_files)
+
 check: checkprogs
 	tests/run_tests.sh $(test_files)
 
