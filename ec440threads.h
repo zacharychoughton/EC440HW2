@@ -17,7 +17,7 @@ int pthread_create(
 void pthread_create_helper(void); 
 //Initilizes threads, sets up scheduler, and TCB.
 
-void schedule(void); 
+void schedule(int signal); 
 //Schedules the threads in round robid fashion.  
 
 pthread_t pthread_self(void); 
