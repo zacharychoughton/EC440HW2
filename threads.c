@@ -37,7 +37,7 @@ static int mainthread = 0; // to see if we are in main process or thread (1 if y
 
 static int numthreads = 1; //number of threads running 
 
-struct sigaction sighandler, oldsighandler; 
+//struct sigaction sighandler, oldsighandler; 
 
 //jmp_buf alpha; //main context 
 
@@ -154,10 +154,15 @@ void pthread_create_helper(){
     ualarm(timer,timer); 
 
     //respond to SIGALRM. -> SIGALRM calls schedule. 
-    sigemptyset(&sighandler.sa_mask);
-    sighandler.sa_handler = &schedule; 
-    sighandler.sa_flags = SA_NODEFER; 
-    sigaction(SIGALRM, &sighandler, NULL); 
+    // sigemptyset(&sighandler.sa_mask);
+    // sighandler.sa_handler = &schedule; 
+    // sighandler.sa_flags = SA_NODEFER; 
+    // sigaction(SIGALRM, &sighandler, NULL); 
+
+    if(signal(SIGALRM,schedule)==SIG_ERR){
+		perror("failed to set signal handler");
+		exit(1);
+	};
 
 } 
 
