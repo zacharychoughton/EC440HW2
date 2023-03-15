@@ -26,7 +26,7 @@ int main(){
     void *(*passfunc_ptr)(void*) = &passfunc; 
     int i; 
 
-    for( int i = 0; i<5; i++);{
+    for( int i = 0; i<5; i++){
     pthread_create(athread[i], attr,  passfunc_ptr, args); 
     }
 
