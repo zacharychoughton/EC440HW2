@@ -16,11 +16,11 @@ void* thread_start(void* arg) {
 }
 
 int main() {
-  pthread_t tid[10];
+  pthread_t tid[20];
   int i; 
 
-  for (i=0;i<10;i++){
-    
+  for (i=0;i<20;i++){
+
     int ret = pthread_create(&tid[i], NULL, thread_start, NULL);
     if (ret != 0) {
     fprintf(stderr, "Error creating thread\n");
