@@ -1,5 +1,6 @@
-override CFLAGS :=  -Werror -Wall -std=gnu99 -O0 -g $(CFLAGS) -I.
+override CFLAGS :=  -std=gnu99 -O0 -g $(CFLAGS) -I.
 CC = gcc
+#-Werror -Wall
 
 threads.o: threads.c ec440threads.h
 
