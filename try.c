@@ -20,6 +20,7 @@ int main() {
   int i; 
 
   for (i=0;i<10;i++){
+    
     int ret = pthread_create(&tid[i], NULL, thread_start, NULL);
     if (ret != 0) {
     fprintf(stderr, "Error creating thread\n");
