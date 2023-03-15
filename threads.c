@@ -213,7 +213,7 @@ void schedule(int signal){
 
 /*******************zthread_self***************************/
 pthread_t pthread_self(void){
-    return currentthread;
+    return TCBlist[currentthread].threadid;
 }
 
 /******************pthread_exit****************************/
