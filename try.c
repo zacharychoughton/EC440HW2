@@ -8,7 +8,7 @@ void* thread_start(void* arg) {
   printf("Thread started\n");
   double i; 
       while(i<1000){
-        i= i+ 0.00001; 
+        i= i+ 0.000001; 
     }
   printf("Thread finished\n");
   return NULL;
