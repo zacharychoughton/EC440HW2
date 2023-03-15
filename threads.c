@@ -39,8 +39,6 @@ static int numthreads = 1; //number of threads running
 
 struct sigaction sighandler; 
 
-//jmp_buf alpha; //main context 
-
 struct TCB{ 
     int status; //0 = exited, 1 = running, 2 = ready, 3 = blocked, 4 = unused
     void* sp; //stack pointer 
@@ -63,16 +61,15 @@ int pthread_create(
         TCBlist[currentthread].status = 1; //running
         mainthread = setjmp(TCBlist[currentthread].regs); //return 0 on set, returns nonzero integer on return from longjmp. 
         //TCBlist[0].regs has main context. 
+        TCBlist[currentthread].threadid = currentthread;
     } //initilizes thread subsystem. 
 
     if (numthreads == max_threads){
-        printf("Did not thread. Max number of threads reached.\n");
+        perror("Did not thread. Max number of threads reached.");
         return -1;
     } //if max number of threads reach, returns -1 and does not make a new thread.
 
     pthread_t newthread = currentthread; 
-
-    // if(!mainthread){ 
 
     while(TCBlist[newthread].status != 4){
         newthread++; 
@@ -121,25 +118,6 @@ void pthread_create_helper(){
         TCBlist[ i ].sp = 0;
         TCBlist[i].threadid = i; 
     }
-    
-    //setting up timer. 
-    // struct timeval timeint, timeval;
-    // timeint.tv_usec = uquanta; 
-    // timeint.tv_sec = quanta; 
-    // timeval.tv_usec = uquanta; 
-    // timeval.tv_sec = quanta;
-    // struct itimerval timing;
-    // timing.it_interval = timeint;
-    // timing.it_value = timeval;
-    // const struct itimerval* timeptr = &timing; 
-
-    //int s;
-    // s = setitimer(ITIMER_VIRTUAL,timeptr,NULL); //sets up regular SIGALRM intervals. 
-
-    // if (s == -1){ 
-    //     printf("Error creating timer\n");
-    //     exit(1); 
-    // }
 
     //respond to SIGALRM. -> SIGALRM calls schedule. 
     sighandler.sa_handler = schedule; // set handler function
@@ -207,35 +185,13 @@ pthread_t pthread_self(void){
 /******************pthread_exit****************************/
 void pthread_exit(void *value_ptr){ 
 
-    TCBlist[currentthread].status = 0; //exited status. 
-
     numthreads--; 
-    //int i,j=0;
 
     free(TCBlist[currentthread].sp);
+
     TCBlist[currentthread].status = 4; 
+
     schedule(SIGALRM);
 
-    // for (i = 0; i<max_threads;i++){ 
-    //     if(TCBlist[i].status == 3 /*blocked*/){
-    //         j = 1; 
-    //         break; 
-    //         }
-    //     else if (TCBlist[i].status == 4 ){
-    //             break; 
-    //         }
-    // }
-
-    // if(j){ 
-    //     schedule(SIGALRM); 
-    // }
-
-    // for( i = 0; i< max_threads; i++){
-    //     if(TCBlist[i].status == 0){
-    //         free(TCBlist[i].sp);
-    //         TCBlist[i].status = 4; //reset to unused.
-    //         TCBlist[i].threadid = 0; 
-    //     }
-    // }
     exit(0);
 }
