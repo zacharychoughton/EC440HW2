@@ -14,6 +14,8 @@ void* thread_start(void* arg) {
 int main() {
   pthread_t tid;
   int ret = pthread_create(&tid, NULL, thread_start, NULL);
+  printf("Main Thread ID: %d\n", pthread_self());
+  printf("Thread 2 ID: %d\n",tid);
   if (ret != 0) {
     fprintf(stderr, "Error creating thread\n");
     exit(EXIT_FAILURE);
