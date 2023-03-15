@@ -17,7 +17,7 @@ void* thread_start(void* arg) {
 
 int main() {
   pthread_t tid[20];
-  int i; 
+  int j; 
 
   for (i=0;i<20;i++){
 
