@@ -78,7 +78,7 @@ int pthread_create(
         newthread++; 
     }
 
-    thread = &TCBlist[newthread].threadid;
+    *thread = TCBlist[newthread].threadid;
 
     setjmp(TCBlist[newthread].regs);
 
