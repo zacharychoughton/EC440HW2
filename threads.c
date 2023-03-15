@@ -37,7 +37,7 @@ static int mainthread = 0; // to see if we are in main process or thread (1 if y
 
 static int numthreads = 1; //number of threads running 
 
-//struct sigaction sighandler, oldsighandler; 
+struct sigaction sighandler; 
 
 //jmp_buf alpha; //main context 
 
@@ -149,6 +149,9 @@ void pthread_create_helper(){
     //     printf("Error creating timer\n");
     //     exit(1); 
     // }
+
+    sighandler.sa_handler = schedule;
+    sighandler.sa_sigaction = &schedule; // set handler function
 
     useconds_t timer = uquanta;
     ualarm(timer,timer); 
