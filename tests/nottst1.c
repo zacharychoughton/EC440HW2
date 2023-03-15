@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void passfunc(void *args) { 
+void *passfunc(void *args) { 
     printf("hi 1\n");
     double i=0; 
     while(i<1000){
