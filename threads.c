@@ -27,7 +27,6 @@
 #define max_threads 128 //max number of threads
 
 #define uquanta 50000 // quanta: 50 ms (50,000 micro s) for each thread executuion time 
-#define quanta 0.05 //seconds 
 
 static int first_time = 1; // determines if helper is called 
 
@@ -93,7 +92,7 @@ int pthread_create(
     void (*temp)(void*) = (void*) &pthread_exit; //pthread exit will be called when start_routine returns. 
     stack = memcpy(stack,&temp, sizeof(temp)); 
 
-    TCBlist[newthread].regs[0].__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
+    TCBlist[newthread].regs->__jmpbuf[JB_RSP] = ptr_mangle((unsigned long int)stack);
 
     TCBlist[newthread].status = 2; 
     //TCBlist[newthread].threadid = newthread; 
