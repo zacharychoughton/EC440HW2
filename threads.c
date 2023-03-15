@@ -150,7 +150,6 @@ void pthread_create_helper(){
     //     exit(1); 
     // }
 
-    sighandler.sa_handler = schedule;
     sighandler.sa_sigaction = &schedule; // set handler function
 
     useconds_t timer = uquanta;
@@ -159,7 +158,7 @@ void pthread_create_helper(){
     //respond to SIGALRM. -> SIGALRM calls schedule. 
     // sigemptyset(&sighandler.sa_mask);
     // sighandler.sa_handler = &schedule; 
-    // sighandler.sa_flags = SA_NODEFER; 
+    sighandler.sa_flags = SA_NODEFER; 
     // sigaction(SIGALRM, &sighandler, NULL); 
 
     if(signal(SIGALRM,schedule)==SIG_ERR){
