@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
+#include <errno.h>
 
 /**********************************************/
 
@@ -200,22 +201,55 @@ void pthread_exit(void *value_ptr){
 ///////// Mutex Functions ///////////////
 int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr){
     // Initializes a mutex. attr is always NULL. Returns 0. 
-    
+    if (mutex == NULL) {
+        return EINVAL; // Invalid argument error
+    }
+    mutexstruct* MCB = (mutexstruct *) malloc(sizeof(mutexstruct));
+
+    MCB->position = unlocked;
+    MCB->line = NULL;
+
+    mutex->__align = (long) MCB; 
+
     return 0; 
 }
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex){
     //Destroys referenced mutex. Return 0.
+    mutexstruct* MCB = (mutexstruct *) (mutex->__align);
 
-    return 0;
+    if (MCB->position != locked){
+        free((void *)(mutex->__align));
+        return 0;
+    }
+    else{
+        return -1;
+    }
+
 }
 
 int pthread_mutex_lock(pthread_mutex_t *mutex) {
     /*Locks referenced mutex. If not yet locked, current thread attains lock and proceeds.
-     If already locked, thread blocks until mutex is available. 
-     If multiple threads are waitng for mutex, order they attain mutex is undefined. 
-     Return 0 on success or error code else. */
+    If already locked, thread blocks until mutex is available. 
+    If multiple threads are waitng for mutex, order they attain mutex is undefined. 
+    Return 0 on success or error code else. */
 
+    mutexstruct* MCB = (mutexstruct *) (mutex->__align);
+
+    if(MCB->position == unlocked){
+        lock();
+        MCB->position = locked;
+        unlock();
+        return 0; 
+    }
+    else{
+        lock();
+        TCBlist[currentthread].status = 3; //block
+        add_to_waiting_list(&MCB->line,currentthread);
+
+        unlock();
+        schedule(SIGALRM);
+    }
     return 0; 
 }
 
@@ -223,6 +257,25 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex){
     /*Unlocks referenced mutex. If another thread is waiting for mutex, its awoken and run.
     Note: When thread awoken, it will finish aquiring the lock. 
     Return 0 on success or error code else. */
+    mutexstruct* MCB = (mutexstruct *) (mutex->__align);
+
+    if(MCB->line == NULL){
+        lock();
+        MCB->position = unlocked;
+        unlock();
+        return 0; 
+    }
+    else{
+        lock();
+        pthread_t ntid;
+        remove_from_waiting_list(&MCB->line, &ntid);
+        MCB->position = locked;
+        TCBlist[ntid].status = 2;
+        unlock();
+        schedule(SIGALRM);
+
+        return 0; 
+    }
 
     return 0; 
 }
@@ -263,3 +316,48 @@ static void unlock(){
     sigaddset(&set,SIGALRM);
     sigprocmask(SIG_UNBLOCK, &set,NULL);
 }
+
+void add_to_waiting_list(waiting_list** head, pthread_t tid) {
+    waiting_list* new_node = (waiting_list*)malloc(sizeof(waiting_list));
+    new_node->tid = tid;
+    new_node->next = NULL;
+
+    if (*head == NULL) {
+        // List is empty, new node becomes the head
+        *head = new_node;
+        new_node->prev = NULL;
+    } else {
+        // Traverse the list to find the last node
+        waiting_list* current = *head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        // Add the new node to the end of the list
+        current->next = new_node;
+        new_node->prev = current;
+    }
+}
+
+void remove_from_waiting_list(waiting_list **head, pthread_t *tid) {
+    if (*head == NULL) {
+        return;
+    }
+
+    waiting_list *temp;
+    temp = (*head);
+    *head = (*head)->next;
+
+    if(*head != NULL){
+        (*head)->prev = NULL;
+    }
+
+    if(tid!=NULL){
+        (*tid) = temp->tid;
+    }
+
+    free(temp);
+ 
+
+}
+
+

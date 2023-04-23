@@ -84,7 +84,8 @@ static void *start_thunk()
 
 typedef struct waiting_list{
     pthread_t tid;
-    struct linked_list* next;
+    struct waiting_list* next;
+    struct waiting_list* prev;
 }waiting_list; 
 
 typedef enum{
@@ -95,7 +96,7 @@ typedef enum{
 typedef struct{ 
     mutex_position position;
     waiting_list *line;
-}Mutex; 
+}mutexstruct;
 
 typedef struct{
         char init; 
@@ -103,11 +104,11 @@ typedef struct{
         pthread_t calling_thread;
         unsigned count;
         unsigned left; 
-}Barrier;
+}barrier;
 
-    ///Mutex Functions
+///Mutex Functions
 
-int pthread_mutex_init(pthread_mutex_t *restrict mutex, cont pthread_mutexattr_t *restrict attr);
+int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr);
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
@@ -115,7 +116,7 @@ int pthread_mutex_lock(pthread_mutex_t *mutex);
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex); 
 
-    ///Barrier Functions 
+///Barrier Functions 
 
 int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barrierattr_t *restrict attr, unsigned count); 
 
