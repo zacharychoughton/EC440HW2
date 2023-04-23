@@ -68,7 +68,7 @@ int pthread_create(
         return -1;
     } //if max number of threads reach, returns -1 and does not make a new thread.
 
-    pthread_t newthread = currentthread; 
+    pthread_t newthread = numthreads; 
 
     while(TCBlist[newthread].status != 4){
         newthread++; 
