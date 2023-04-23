@@ -79,4 +79,56 @@ static void *start_thunk()
   __builtin_unreachable();
 }
 
+///////////////// Synchornization //////////////
+    /// Structures 
+
+typedef struct waiting_list{
+    pthread_t tid;
+    struct linked_list* next;
+}waiting_list; 
+
+typedef enum{
+    locked,
+    unlocked
+}mutex_position; 
+
+typedef struct{ 
+    mutex_position position;
+    waiting_list *line;
+}Mutex; 
+
+typedef struct{
+        char init; 
+        char flag;
+        pthread_t calling_thread;
+        unsigned count;
+        unsigned left; 
+}Barrier;
+
+    ///Mutex Functions
+
+int pthread_mutex_init(pthread_mutex_t *restrict mutex, cont pthread_mutexattr_t *restrict attr);
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex); 
+
+    ///Barrier Functions 
+
+int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barrierattr_t *restrict attr, unsigned count); 
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier); 
+
+int pthread_barrier_wait(pthread_barrier_t *barrier); 
+
+    ///Recomended Internal Functions
+
+static void lock(); 
+// Disable timer that calls schedule routine.
+
+static void unlock(); 
+// Re-enable timer. 
+
 #endif

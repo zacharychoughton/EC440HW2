@@ -194,3 +194,72 @@ void pthread_exit(void *value_ptr){
 
     exit(0);
 }
+
+////////////////////////// Synchronization //////////////////////
+
+///////// Mutex Functions ///////////////
+int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr){
+    // Initializes a mutex. attr is always NULL. Returns 0. 
+    
+    return 0; 
+}
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex){
+    //Destroys referenced mutex. Return 0.
+
+    return 0;
+}
+
+int pthread_mutex_lock(pthread_mutex_t *mutex) {
+    /*Locks referenced mutex. If not yet locked, current thread attains lock and proceeds.
+     If already locked, thread blocks until mutex is available. 
+     If multiple threads are waitng for mutex, order they attain mutex is undefined. 
+     Return 0 on success or error code else. */
+
+    return 0; 
+}
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex){
+    /*Unlocks referenced mutex. If another thread is waiting for mutex, its awoken and run.
+    Note: When thread awoken, it will finish aquiring the lock. 
+    Return 0 on success or error code else. */
+
+    return 0; 
+}
+
+///////// Barrier Functions ///////////////
+
+int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barrierattr_t *restrict attr, unsigned count){
+    /*Initializes given barrier. attr always NULL. Count specifies how many 
+    threads must enter barrier before any threads can exit barrier. 
+    Return 0 on success. Error (EINVAL) if count = 0. */
+    return 0; 
+}
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier){
+    /*Destroys referenced barrier. Return 0 on success.*/
+    return 0; 
+}
+
+int pthread_barrier_wait(pthread_barrier_t *barrier){
+    /* Enteres refrerenced barrier. Calling thread will not proceed until 
+    required number of threads (from count in init) have entered the barrier*/
+    return 0;
+}
+
+///// Internal Functions //////
+static void lock(){
+// Disable timer that calls schedule routine.
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set,SIGALRM);
+    sigprocmask(SIG_BLOCK, &set,NULL);
+}
+
+static void unlock(){
+// Re-enable timer. 
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set,SIGALRM);
+    sigprocmask(SIG_UNBLOCK, &set,NULL);
+}
