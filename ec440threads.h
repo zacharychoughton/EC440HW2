@@ -132,4 +132,8 @@ static void lock();
 static void unlock(); 
 // Re-enable timer. 
 
+void remove_from_waiting_list(waiting_list **head, pthread_t *tid);
+
+void add_to_waiting_list(waiting_list** head, pthread_t tid);
+
 #endif
