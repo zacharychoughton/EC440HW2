@@ -297,9 +297,8 @@ int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barr
     BCB->count = count;
     BCB->flag = 0;
     BCB->calling_thread = -1;
-    BCB->__align = (long) BCB;
-
-    barrier->__align = (void*) BCB;
+    
+    barrier->__align = (long) BCB;
 
     return 0; 
 }
