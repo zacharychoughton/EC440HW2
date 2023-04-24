@@ -286,18 +286,81 @@ int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barr
     /*Initializes given barrier. attr always NULL. Count specifies how many 
     threads must enter barrier before any threads can exit barrier. 
     Return 0 on success. Error (EINVAL) if count = 0. */
+    if(count == 0){
+        return EINVAL;
+    }
+
+    barstruct *BCB = (barstruct*) malloc(sizeof(barstruct));
+
+    BCB->init = 1;
+    BCB->left = count; 
+    BCB->count = count;
+    BCB->flag = 0;
+    BCB->calling_thread = -1;
+    BCB->__align = (long) BCB;
+
+    barrier->__align = (void*) BCB;
+
     return 0; 
 }
 
 int pthread_barrier_destroy(pthread_barrier_t *barrier){
     /*Destroys referenced barrier. Return 0 on success.*/
+    barstruct *BCB = (barstruct*) (barrier->__align);
+
+    if(BCB->init != 0){
+        BCB->init = 0;
+        BCB->left = 0;
+        BCB->count = 0;
+        BCB->calling_thread = -1;
+        free((void *)(barrier->__align));
+        return 0;
+    }
+    else{
+        return -1;
+    }
     return 0; 
 }
 
 int pthread_barrier_wait(pthread_barrier_t *barrier){
     /* Enteres refrerenced barrier. Calling thread will not proceed until 
     required number of threads (from count in init) have entered the barrier*/
-    return 0;
+    barstruct *BCB = (barstruct*) (barrier->__align);
+    
+    lock();
+    (BCB->left)--;
+
+    if(BCB->flag != 1){
+        TCBlist[currentthread].status = 3; //blocked
+        BCB->calling_thread = currentthread;
+        BCB->flag = 1;
+        unlock();
+        schedule(SIGALRM);
+    }
+    else{
+        unlock();
+    }
+
+    while(BCB->left != 0){
+        schedule(SIGALRM);
+    }
+
+    lock();
+    if(BCB->flag ==1){
+        BCB->flag = 0;
+        TCBlist[BCB->calling_thread].status = 2; //ready
+    }
+    unlock();
+
+    schedule(SIGALRM);
+
+    if(BCB->calling_thread == currentthread){
+        BCB->left = BCB->count;
+        return PTHREAD_BARRIER_SERIAL_THREAD;
+    }
+    else{
+        return 0;
+    }
 }
 
 ///// Internal Functions //////

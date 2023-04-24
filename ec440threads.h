@@ -99,12 +99,12 @@ typedef struct{
 }mutexstruct;
 
 typedef struct{
-        char init; 
-        char flag;
-        pthread_t calling_thread;
-        unsigned count;
-        unsigned left; 
-}barrier;
+    char init; 
+    char flag;
+    pthread_t calling_thread;
+    unsigned count;
+    unsigned left; 
+}barstruct;
 
 ///Mutex Functions
 
