@@ -297,7 +297,7 @@ int pthread_barrier_init(pthread_barrier_t *restrict barrier, const pthread_barr
     BCB->count = count;
     BCB->flag = 0;
     BCB->calling_thread = -1;
-    
+
     barrier->__align = (long) BCB;
 
     return 0; 
@@ -335,6 +335,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier){
         BCB->flag = 1;
         unlock();
         schedule(SIGALRM);
+        BCB->left = BCB->count;
     }
     else{
         unlock();
